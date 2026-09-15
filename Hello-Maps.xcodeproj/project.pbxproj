@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8DC9A9CF2A7823AE00B7BD89 /* Hello_MapsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9A9CE2A7823AE00B7BD89 /* Hello_MapsApp.swift */; };
+		8DC9A9CF2A7823AE00B7BD89 /* BagItUpApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9A9CE2A7823AE00B7BD89 /* BagItUpApp.swift */; };
 		8DC9A9D32A7823AF00B7BD89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8DC9A9D22A7823AF00B7BD89 /* Assets.xcassets */; };
 		8DC9A9D62A7823AF00B7BD89 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8DC9A9D52A7823AF00B7BD89 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		8DC9A9CB2A7823AE00B7BD89 /* Hello-Maps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hello-Maps.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8DC9A9CE2A7823AE00B7BD89 /* Hello_MapsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hello_MapsApp.swift; sourceTree = "<group>"; };
+		8DC9A9CE2A7823AE00B7BD89 /* BagItUpApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagItUpApp.swift; sourceTree = "<group>"; };
 		8DC9A9D22A7823AF00B7BD89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8DC9A9D52A7823AF00B7BD89 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -68,7 +68,7 @@
 				47529D7F3059022E00F508E4 /* Models */,
 				47529D7930539CC900F508E4 /* Service */,
 				47D88CB83050F5C7003BB14A /* Views */,
-				8DC9A9CD2A7823AE00B7BD89 /* Hello-Maps */,
+				8DC9A9CD2A7823AE00B7BD89 /* BagItUPApp */,
 				8DC9A9CC2A7823AE00B7BD89 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -81,14 +81,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8DC9A9CD2A7823AE00B7BD89 /* Hello-Maps */ = {
+		8DC9A9CD2A7823AE00B7BD89 /* BagItUPApp */ = {
 			isa = PBXGroup;
 			children = (
-				8DC9A9CE2A7823AE00B7BD89 /* Hello_MapsApp.swift */,
+				8DC9A9CE2A7823AE00B7BD89 /* BagItUpApp.swift */,
 				8DC9A9D22A7823AF00B7BD89 /* Assets.xcassets */,
 				8DC9A9D42A7823AF00B7BD89 /* Preview Content */,
 			);
-			path = "Hello-Maps";
+			path = BagItUPApp;
 			sourceTree = "<group>";
 		};
 		8DC9A9D42A7823AF00B7BD89 /* Preview Content */ = {
@@ -169,7 +169,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DC9A9CF2A7823AE00B7BD89 /* Hello_MapsApp.swift in Sources */,
+				8DC9A9CF2A7823AE00B7BD89 /* BagItUpApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
