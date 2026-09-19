@@ -22,6 +22,7 @@ struct BagItUp_App: App {
             }else {
                 DashboardView()
             }
+            //based on onboarding process to see if need to open the app on onboaridn view
             
          
         }
