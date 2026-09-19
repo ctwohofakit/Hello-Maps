@@ -9,9 +9,21 @@ import SwiftUI
 
 @main
 struct BagItUp_App: App {
+    @StateObject private var notificaitonManager = NotificationManager.shared
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboaridng = false
+    
     var body: some Scene {
+      
         WindowGroup {
-            OnBoardingView()
+            if !hasCompletedOnboaridng{
+                OnBoardingView()
+            }else if notificaitonManager.showBagConfirmation{
+                BagConfirmationView()
+            }else {
+                DashboardView()
+            }
+            
+         
         }
     }
 }

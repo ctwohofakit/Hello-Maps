@@ -3,14 +3,14 @@
 //  Hello-Maps
 //
 //  Created by Kit Sitou on 9/8/26.
-//
+//app storage for redisplay 
 
 import SwiftUI
 
 struct OnBoardingView: View {
 
     @State private var addresses: [Address] = []
-
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
     private var homeAddress: Address? {
         addresses.first {
@@ -32,6 +32,7 @@ struct OnBoardingView: View {
     }
 
     var body: some View {
+      
 
         NavigationStack {
             ProgressView(
@@ -41,7 +42,15 @@ struct OnBoardingView: View {
             .padding()
             VStack(spacing: 20) {
 
+                VStack {
+                    Button("Allow Notifications") {
+                        NotificationManager.shared.requestPermission()
+                    }
 
+                    Button("Test Notification") {
+                        NotificationManager.shared.scheduleNotification()
+                    }
+                }
 
                 // HOME
                 HStack {
@@ -75,6 +84,9 @@ struct OnBoardingView: View {
                                 ? "plus"
                                 : "pencil"
                         )
+                        .onAppear{
+                            loadAddresses()
+                        }
                         .foregroundStyle(.white)
                         .frame(width: 40, height: 40)
                         .background(
@@ -165,13 +177,14 @@ struct OnBoardingView: View {
         }
         .onAppear {
             loadAddresses()
+            checkOnboardingFinished()
         }
     }
-    
+
     private func loadAddresses(){
         guard let data = UserDefaults.standard.data(
             forKey: "savedAddresses"
-        )else {
+        ) else {
             return
         }
         do{
@@ -183,10 +196,13 @@ struct OnBoardingView: View {
             print("Fail to load address: \(error)")
         }
     }
-
-
+    
+    private func checkOnboardingFinished(){
+        if homeAddress != nil && storeAddresses.count>=5{
+            hasCompletedOnboarding = true
+        }
+    }
 //#Preview {
 //    OnBoardingView()
 //}
 }
-

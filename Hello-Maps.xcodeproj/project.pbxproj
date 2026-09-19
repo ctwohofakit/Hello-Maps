@@ -9,22 +9,24 @@
 /* Begin PBXBuildFile section */
 		8DC9A9CF2A7823AE00B7BD89 /* BagItUpApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9A9CE2A7823AE00B7BD89 /* BagItUpApp.swift */; };
 		8DC9A9D32A7823AF00B7BD89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8DC9A9D22A7823AF00B7BD89 /* Assets.xcassets */; };
-		8DC9A9D62A7823AF00B7BD89 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8DC9A9D52A7823AF00B7BD89 /* Preview Assets.xcassets */; };
+		8DC9A9D62A7823AF00B7BD89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8DC9A9D52A7823AF00B7BD89 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		8DC9A9CB2A7823AE00B7BD89 /* Hello-Maps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hello-Maps.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DC9A9CE2A7823AE00B7BD89 /* BagItUpApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BagItUpApp.swift; sourceTree = "<group>"; };
 		8DC9A9D22A7823AF00B7BD89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8DC9A9D52A7823AF00B7BD89 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		8DC9A9D52A7823AF00B7BD89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		47529D7B3053AE1C00F508E4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				GeofenceManager.swift,
 				LocationHelper.swift,
 				LocationManager.swift,
+				NotificationManager.swift,
 			);
 			target = 8DC9A9CA2A7823AD00B7BD89 /* Hello-Maps */;
 		};
@@ -32,6 +34,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Addresses.swift,
+				ShoppingTrip.swift,
 			);
 			target = 8DC9A9CA2A7823AD00B7BD89 /* Hello-Maps */;
 		};
@@ -39,6 +42,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AddressSearchView.swift,
+				BagConfirmationView.swift,
+				DashboardView.swift,
 				OnBoardingView.swift,
 			);
 			target = 8DC9A9CA2A7823AD00B7BD89 /* Hello-Maps */;
@@ -94,7 +99,7 @@
 		8DC9A9D42A7823AF00B7BD89 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				8DC9A9D52A7823AF00B7BD89 /* Preview Assets.xcassets */,
+				8DC9A9D52A7823AF00B7BD89 /* Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -157,7 +162,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DC9A9D62A7823AF00B7BD89 /* Preview Assets.xcassets in Resources */,
+				8DC9A9D62A7823AF00B7BD89 /* Assets.xcassets in Resources */,
 				8DC9A9D32A7823AF00B7BD89 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -306,7 +311,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Hello-Maps/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = V27QP694V8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
