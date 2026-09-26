@@ -16,10 +16,27 @@ enum DwellPhase{
 
 
 final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    static let shared = GeofenceManager()
     private let locationManager = CLLocationManager()
     private var pendingRegion: CLCircularRegion?
     private var dwellTask: Task<Void, Never>? //<specific type>
     private var dwellPhase: DwellPhase = .initialCheck
+
+    // one shared GeofenceManager
+
+       
+
+       @Published var didEnterStore = false        // debug value for UI
+
+       @Published var currentSpeedMph: Double = 0  // debug value for UI
+
+       @Published var distanceToStore: Double = 0  // debug value for UI
+
+       @Published var lastEvent = "Waiting..."     // latest debug event
+    @Published var notificationFired: Bool = false
+
+       // did we reach notification step?
+
     override init(){
         super.init()
         locationManager.delegate = self
@@ -38,16 +55,29 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     
     //condition: didEnterRegion-> driving/moving speed less than 10mph, >30second , userNotification
     //check geofence entry
+    /*
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        guard region.identifier == pendingRegion?.identifier else {return}
-        
-        print("enter geofence for store \(region) region")
-        dwellTask?.cancel()
-        dwellTask = nil
-        pendingRegion = nil
-        dwellPhase = .initialCheck
-//        manager.requestLocation() //get location update now
+        guard let circularRegion = region as? CLCircularRegion else {
+            return                                             // only handle circular store regions
+        }
+
+        didEnterStore = true                                   // FieldTestView shows TRUE
+
+        lastEvent = "Entered store geofence"                   // FieldTestView shows event
+
+        pendingRegion = circularRegion                         // remember WHICH store was entered
+
+        dwellPhase = .initialCheck                             // begin with speed check
+
+        dwellTask?.cancel()                                    // cancel any previous dwell timer
+
+        dwellTask = nil                                        // remove previous timer reference
+
+        print("Entered region: \(region.identifier)")
+
+        manager.requestLocation()                              // get current location + speed
     }
+     */
     
     
     //get the lastest loation upadte from CLLocation, used to check speed
@@ -71,7 +101,7 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         case .initialCheck:
             if speedMph <= 10 {
                 print("speedMph btw 0-10, user slow down")
-                Task { await self.startDwellTimer() }
+             startDwellTimer() 
             } else {
                 print("user is moving at \(speedMph) mph")
             }
@@ -88,12 +118,12 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         }
     }
     
-    @MainActor
+ 
     private func startDwellTimer() {
         dwellTask?.cancel()
         dwellTask = Task {
             do {
-                try await Task.sleep(for: .seconds(30))
+                try await Task.sleep(for: .seconds(10))
                 guard !Task.isCancelled else { return }
                 print("finished dwelling 30 second")
                 dwellPhase = .finalCheck
@@ -103,5 +133,30 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
             }
         }
     }
-}
+    
+    func locationManager(
+        _ manager: CLLocationManager,                         // location manager sending event
+        didEnterRegion region: CLRegion                       // region the phone entered
+    ) {
 
+        guard let circularRegion = region as? CLCircularRegion else {
+            return                                             // make sure it's circular
+        }
+
+        didEnterStore = true                                   // debug screen → TRUE
+
+        lastEvent = "Entered store geofence"                   // debug screen status
+
+        pendingRegion = circularRegion                         // remember entered store region
+
+        dwellPhase = .initialCheck                             // start speed check
+
+        dwellTask?.cancel()                                    // cancel old timer
+
+        dwellTask = nil                                        // clear old timer
+
+        print("Entered region: \(region.identifier)")
+
+        manager.requestLocation()                              // get current speed/location
+    }
+}

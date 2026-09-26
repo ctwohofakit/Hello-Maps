@@ -7,10 +7,16 @@
 
 import SwiftUI
 
-struct OnBoardingView: View {
 
+
+struct OnBoardingView: View {
+   //MARK: non-mock
     @State private var addresses: [Address] = []
+    @State private var goToDashboard: Bool = false
+
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
+    
 
     private var homeAddress: Address? {
         addresses.first {
@@ -39,7 +45,7 @@ struct OnBoardingView: View {
                 value: Double(progress),
                 total: 6
             )
-            .padding()
+            .padding(5)
             VStack(spacing: 20) {
 
                 VStack {
@@ -170,14 +176,34 @@ struct OnBoardingView: View {
                         .disabled(homeAddress == nil)
                     }
                 }
+                Button("Reset Onboarding"){
+                    UserDefaults.standard.removeObject(forKey: "savedAddresses")
+                    UserDefaults.standard.set(false, forKey: "hasCompletedOnboarindg")
+                    
+                }
+                Button("Finish Setup All Addresses"){
+                    hasCompletedOnboarding = true
+                    
+                }.disabled(homeAddress == nil)
 
                 Divider()
             }
             .padding()
         }
         .onAppear {
+            
             loadAddresses()
-            checkOnboardingFinished()
+            NotificationManager.shared.requestPermission()   
+        }
+        .onChange(of: progress){oldValue, newValue in
+            if newValue == 6{
+                hasCompletedOnboarding = true
+                goToDashboard = true
+            }
+        }
+        .navigationDestination(isPresented: $goToDashboard) {
+            DashboardContentView()
+                .navigationBarBackButtonHidden(true)
         }
     }
 
@@ -185,6 +211,7 @@ struct OnBoardingView: View {
         guard let data = UserDefaults.standard.data(
             forKey: "savedAddresses"
         ) else {
+            addresses = []   
             return
         }
         do{
@@ -202,7 +229,6 @@ struct OnBoardingView: View {
             hasCompletedOnboarding = true
         }
     }
-//#Preview {
-//    OnBoardingView()
-//}
+    
+
 }
