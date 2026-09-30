@@ -8,35 +8,32 @@
 import CoreLocation
 import Foundation
 
-enum DwellPhase{
-    case initialCheck
-    case finalCheck
-}
 
 
 
 final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     static let shared = GeofenceManager()
     private let locationManager = CLLocationManager()
-    private var pendingRegion: CLCircularRegion?
+    private var hasNotifiedCurrentVisit = false //only fire once per visit, use this to check
     private var dwellTask: Task<Void, Never>? //<specific type>
-    private var dwellPhase: DwellPhase = .initialCheck
-
+//    private var dwellPhase: DwellPhase = .initialCheck
+    private var monitoredStores: [Address] = []
+    
     // one shared GeofenceManager
-
-       
-
-       @Published var didEnterStore = false        // debug value for UI
-
-       @Published var currentSpeedMph: Double = 0  // debug value for UI
-
-       @Published var distanceToStore: Double = 0  // debug value for UI
-
-       @Published var lastEvent = "Waiting..."     // latest debug event
+    
+    
+    
+    @Published var didEnterStore = false        // debug value for UI
+    
+    @Published var currentSpeedMph: Double = 0  // debug value for UI
+    
+    @Published var distanceToStore: Double = 0  // debug value for UI
+    
+    @Published var lastEvent = "Waiting..."     // latest debug event
     @Published var notificationFired: Bool = false
-
-       // did we reach notification step?
-
+    
+    // did we reach notification step?
+    
     override init(){
         super.init()
         locationManager.delegate = self
@@ -47,7 +44,7 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     func startMonitoring(stores: [Address]){// monitor all store
         for store in stores{
             let center = CLLocationCoordinate2D(latitude: store.latitude, longitude: store.longitude) //need store lat+long to map out the center
-            let region = CLCircularRegion(center: center, radius: 150, identifier: store.id.uuidString) //set how big of the circle radius as a fence
+            let region = CLCircularRegion(center: center, radius: 200, identifier: store.id.uuidString) //set how big of the circle radius as a fence
             locationManager.startMonitoring(for: region)//register for geofence
             print ("currently monitoring \(store.name)")
         }
@@ -56,27 +53,27 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     //condition: didEnterRegion-> driving/moving speed less than 10mph, >30second , userNotification
     //check geofence entry
     /*
-    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        guard let circularRegion = region as? CLCircularRegion else {
-            return                                             // only handle circular store regions
-        }
-
-        didEnterStore = true                                   // FieldTestView shows TRUE
-
-        lastEvent = "Entered store geofence"                   // FieldTestView shows event
-
-        pendingRegion = circularRegion                         // remember WHICH store was entered
-
-        dwellPhase = .initialCheck                             // begin with speed check
-
-        dwellTask?.cancel()                                    // cancel any previous dwell timer
-
-        dwellTask = nil                                        // remove previous timer reference
-
-        print("Entered region: \(region.identifier)")
-
-        manager.requestLocation()                              // get current location + speed
-    }
+     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+     guard let circularRegion = region as? CLCircularRegion else {
+     return                                             // only handle circular store regions
+     }
+     
+     didEnterStore = true                                   // FieldTestView shows TRUE
+     
+     lastEvent = "Entered store geofence"                   // FieldTestView shows event
+     
+     pendingRegion = circularRegion                         // remember WHICH store was entered
+     
+     dwellPhase = .initialCheck                             // begin with speed check
+     
+     dwellTask?.cancel()                                    // cancel any previous dwell timer
+     
+     dwellTask = nil                                        // remove previous timer reference
+     
+     print("Entered region: \(region.identifier)")
+     
+     manager.requestLocation()                              // get current location + speed
+     }
      */
     
     
@@ -97,40 +94,39 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         
         let speedMph = speedMps * 2.23694
         
-        switch dwellPhase {
-        case .initialCheck:
-            if speedMph <= 10 {
-                print("speedMph btw 0-10, user slow down")
-             startDwellTimer() 
-            } else {
-                print("user is moving at \(speedMph) mph")
-            }
-        case .finalCheck:
-            guard let region = pendingRegion else { return }
-            let storeLocation = CLLocation(latitude: region.center.latitude, longitude: region.center.longitude)
-            let distance = location.distance(from: storeLocation)
-            if distance <= region.radius && speedMph <= 10 {
-                print("user arrived to store")
-                Task { await NotificationManager.shared.scheduleNotification() }
-            } else {
-                print("user did not pass the final check")
-            }
+        currentSpeedMph = speedMph
+        
+        guard !hasNotifiedCurrentVisit else{ return} //if already notified do nothing
+        if speedMph <= 10{
+            lastEvent = "Arrival detected"
+            startDwellTimer()
+        }else {
+            lastEvent = "enter but too fast moving"
+            print("usr moving at \(speedMph) mph")
         }
-    }
     
- 
+}
     private func startDwellTimer() {
         dwellTask?.cancel()
         dwellTask = Task {
             do {
                 try await Task.sleep(for: .seconds(10))
                 guard !Task.isCancelled else { return }
-                print("finished dwelling 30 second")
-                dwellPhase = .finalCheck
-                locationManager.requestLocation()
-            } catch {
-                print("Dwell timer canceled")
-            }
+                guard !hasNotifiedCurrentVisit else{ return} //if already notified do nothing
+
+              
+                notificationFired = true
+                hasNotifiedCurrentVisit = true
+                lastEvent = "Notification fired"
+                await MainActor.run {
+                            NotificationManager.shared
+                                .scheduleNotification()         //schedule notification
+                        }
+
+                    } catch {
+
+                        print("Dwell timer canceled")
+                    }
         }
     }
     
@@ -147,9 +143,7 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
 
         lastEvent = "Entered store geofence"                   // debug screen status
 
-        pendingRegion = circularRegion                         // remember entered store region
-
-        dwellPhase = .initialCheck                             // start speed check
+    /*    pendingRegion = circularRegion */                        // remember entered store region
 
         dwellTask?.cancel()                                    // cancel old timer
 
@@ -158,5 +152,18 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         print("Entered region: \(region.identifier)")
 
         manager.requestLocation()                              // get current speed/location
+    }
+    
+    
+    
+    //add a reset notification status when user exit the store
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion){
+        hasNotifiedCurrentVisit = false
+        notificationFired = false
+        didEnterStore = false
+        dwellTask?.cancel()
+        dwellTask = nil
+        lastEvent = "Existed store gefence"                                                              
+        print("exit region\(region.identifier)")
     }
 }

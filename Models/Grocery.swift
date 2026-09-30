@@ -1,13 +1,29 @@
 //
-//  Untitled.swift
-//  Hello-Maps
+//  GroceryItem.swift
 //
 //  Created by Kit Sitou on 9/24/26.
 //
 
 import Foundation
+import SwiftData
 
-enum FoodCategory: String, Codable, Equatable{
+@Model
+final class GroceryItem{
+
+    var foodName: String
+    var foodcat: FoodCategory
+    var isCompleted: Bool
+    
+    init( foodName: String, foodcat: FoodCategory, isCompleted:Bool = false) {
+
+        self.foodName = foodName
+        self.foodcat = foodcat
+        self.isCompleted = isCompleted
+    }
+}
+
+
+enum FoodCategory: String, Codable, CaseIterable{
     case protein = "Protein"
     case produce = "Produce"
     case meat = "Meat"
@@ -18,9 +34,3 @@ enum FoodCategory: String, Codable, Equatable{
     
 }
 
-struct Grocery{
-    var id:UUID
-    var foodName: String
-    var foodcat: FoodCategory
-    
-}

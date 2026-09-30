@@ -4,7 +4,7 @@
 //
 //  Created by Mohammad Azam on 7/31/23.
 //
-
+import SwiftData
 import SwiftUI
 
 @main
@@ -26,6 +26,10 @@ struct BagItUp_App: App {
                         .tabItem {
                             Label("Home", systemImage: "house.fill")
                         }
+                    GroceryListView()
+                        .tabItem{
+                            Label("Grocery", systemImage: "fork.knife.circle")
+                        }
                     OnBoardingView()
                         .tabItem {
                             Label("Address", systemImage: "mappin.and.ellipse")
@@ -40,5 +44,6 @@ struct BagItUp_App: App {
            
             }
         }
+        .modelContainer(for: GroceryItem.self)
     }
 }

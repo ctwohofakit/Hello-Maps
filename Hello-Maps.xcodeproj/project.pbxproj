@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 73;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -43,12 +43,12 @@
 		47D88CB93050F5CE003BB14A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AddEditView.swift,
 				AddressSearchView.swift,
 				BagConfirmationView.swift,
 				DashboardView.swift,
 				FieldTestView.swift,
-				FoodDetailView.swift,
+				GroceryListView.swift,
+				GroceryRowView.swift,
 				OnBoardingView.swift,
 				SettingsView.swift,
 			);
@@ -56,21 +56,11 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		47A9990E30636641001F0062 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 8DC9A9C92A7823AD00B7BD89 /* Resources */;
-			membershipExceptions = (
-				FoodListView.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		47529D7930539CC900F508E4 /* Service */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (47529D7B3053AE1C00F508E4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Service; sourceTree = "<group>"; };
 		47529D7F3059022E00F508E4 /* Models */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (47529D803059023800F508E4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Models; sourceTree = "<group>"; };
 		47A99906305EFBA4001F0062 /* Utility */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Utility; sourceTree = "<group>"; };
-		47D88CB83050F5C7003BB14A /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (47D88CB93050F5CE003BB14A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 47A9990E30636641001F0062 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
+		47D88CB83050F5C7003BB14A /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (47D88CB93050F5CE003BB14A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +148,7 @@
 				};
 			};
 			buildConfigurationList = 8DC9A9C62A7823AD00B7BD89 /* Build configuration list for PBXProject "Hello-Maps" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -165,7 +156,6 @@
 				Base,
 			);
 			mainGroup = 8DC9A9C22A7823AD00B7BD89;
-			preferredProjectObjectVersion = 56;
 			productRefGroup = 8DC9A9CC2A7823AE00B7BD89 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

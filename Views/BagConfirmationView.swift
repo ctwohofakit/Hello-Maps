@@ -30,6 +30,8 @@ struct BagConfirmationView: View {
                         .buttonStyle(.bordered)
                               .controlSize(.large)
                               .buttonBorderShape(.automatic)
+     
+
                     Spacer()
                     Button{
                         updateTrip(id: id, result:.forgotten)
@@ -39,9 +41,12 @@ struct BagConfirmationView: View {
                         .buttonStyle(.bordered)
                               .controlSize(.large)
                               .buttonBorderShape(.automatic)
+                     
+
                 }.padding()
-                    .frame(width:335, height:600)
-                    .background(.mint)
+                    .frame(width:335, height:500)
+                    .background(.butterfly)
+                    .cornerRadius(12)
                 
             }
             
