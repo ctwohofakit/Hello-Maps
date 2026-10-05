@@ -62,6 +62,7 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
         content.title = "Bag Reminder!!!"
         content.body = "Don't forget to bring your reusable bag before heading inside."
         content.sound = .default
+        showBagConfirmation = true 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         let request = UNNotificationRequest(identifier: "reusableBagReminder", content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(request) { error in

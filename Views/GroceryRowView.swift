@@ -9,17 +9,22 @@ struct GroceryRowView: View {
     @Bindable var item:GroceryItem
     
     var body: some View{
-        HStack{
-                Button{
-                    item.isCompleted.toggle()
-                }label:{
-                    Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+        
+                HStack{
+                    
+                    Button{
+                        item.isCompleted.toggle()
+                    }label:{
+                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                    }
+                    .buttonStyle(.plain)
+                    
+                    TextField("grocery item", text: $item.foodName)
+                        .strikethrough(item.isCompleted)
+                    
                 }
-                .buttonStyle(.plain)
+                
             
-                TextField("grocery item", text: $item.foodName)
-                    .strikethrough(item.isCompleted)
-
-            }
+        
     }
 }

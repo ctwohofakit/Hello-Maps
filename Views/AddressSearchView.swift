@@ -8,16 +8,19 @@
 import SwiftUI
 import MapKit // import map view
 import CoreLocation
+import SwiftData
 //import Combine
 
 struct AddressSearchView: View {
-    
+
     @StateObject private var locationManager = LocationManager()
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var searchText: String = ""
     @State private var results: [SearchResult] = []
     @State private var selectedLocation: MKMapItem?
     @State private var searchError: String = ""
+    @Query private var addresses: [Address]
     let editingAddressID: UUID?
     
     let type: AddType
@@ -36,7 +39,7 @@ struct AddressSearchView: View {
                 : "Add a Frequent Store"
             )
             HStack {
-                TextField(type == .home ? "Enter your home addrss" : "Serach for a frequent store", text: $searchText)
+                TextField(type == .home ? "Enter your home addrss" : " input store name and city name", text: $searchText)
                     .textFieldStyle(.roundedBorder)
                     .submitLabel(.search)
                     .onSubmit {
@@ -109,9 +112,7 @@ struct AddressSearchView: View {
                     )
                 }
                 .buttonStyle(.borderedProminent)
-            }
-            
-            Spacer()
+         
             
             Button {
                 dismiss()
@@ -119,6 +120,7 @@ struct AddressSearchView: View {
                 Text("Cancel")
             }
             .buttonStyle(.borderedProminent)
+        }
         }
         .padding()
     }
@@ -142,7 +144,10 @@ struct AddressSearchView: View {
         request.naturalLanguageQuery = cleanedSearchText
         
         if type == .store,
-           let home = loadAddress(ofType: .home).first {
+           let home = addresses.first(where:{ address in
+               address.type == .home
+           }){
+               
             request.region = MKCoordinateRegion(
                 center: CLLocationCoordinate2D( //set serach request's region to home lat and long
                     latitude: home.latitude,
@@ -199,42 +204,27 @@ struct AddressSearchView: View {
     }
     
     private func saveAddress(_ newAddress: Address) {
-        var savedAddresses: [Address] = []
-        
-        if let data = UserDefaults.standard.data(forKey: "savedAddresses") {
-            do {
-                savedAddresses = try JSONDecoder().decode(
-                    [Address].self,
-                    from: data
-                )
-            } catch {
-                print("fail to load address: \(error)")
+        if newAddress.type == .home{
+
+            for home in addresses where home.type == .home {
+                modelContext.delete(home)                      // remove old Home
             }
+
+        } else if let editingAddressID,                        // STORE is being edited
+                  let oldStore = addresses.first(where: {      // find existing store
+                      $0.id == editingAddressID
+                  }) {
+
+            modelContext.delete(oldStore)                      // remove old store
         }
-        if newAddress.type == .home {
-            savedAddresses.removeAll {
-                $0.type == .home
-            }
-        }
-        savedAddresses.append(newAddress)
-        for address in savedAddresses {
-            print("saved address \(address.type)")
-            print("Address:\(address.address)")
-        }
-        do {
-            let data = try JSONEncoder().encode(savedAddresses)
-            UserDefaults.standard.set(
-                data,
-                forKey: "savedAddresses"
-            )
-            print("Address saved")
-            dismiss()
-        } catch {
-            print("failed to save address: \(error)")
-        }
+
+        modelContext.insert(newAddress)
+        try? modelContext.save()
+
+        dismiss()                                              
     }
     
-    private func saveSelectedAddress() {
+    private func saveSelectedAddress() { //create address from the select mapkit locaiton
         guard let selectedLocation else {
             searchError = "please selec a loation first"
             return
@@ -250,24 +240,14 @@ struct AddressSearchView: View {
         saveAddress(newAddress)
     }
     
-    private func loadAddress(ofType type: AddType) -> [Address] {
-        guard let data = UserDefaults.standard.data(forKey: "savedAddresses") else {
-            return []
-        }
-        do {
-            let addresses = try JSONDecoder().decode([Address].self, from: data)
-            return addresses.filter { $0.type == type }
-        } catch {
-            print("fail to load address error for type \(type): \(error))")
-            return []
-        }
-    }
     
     func moveMapToHome() {
         guard type == .store else {
             return
         }
-        guard let home = loadAddress(ofType: .home).first else {
+        guard let home = addresses.first(where: {address in
+            address.type == .home
+        }) else {
             print("no home address found")
             return
         }

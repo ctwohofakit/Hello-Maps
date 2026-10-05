@@ -6,17 +6,12 @@
 //app storage for redisplay 
 
 import SwiftUI
-
-
+import SwiftData
 
 struct OnBoardingView: View {
    //MARK: non-mock
-    @State private var addresses: [Address] = []
-    @State private var goToDashboard: Bool = false
-
+    @Query private var addresses:[Address]
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-
-    
 
     private var homeAddress: Address? {
         addresses.first {
@@ -41,11 +36,21 @@ struct OnBoardingView: View {
       
 
         NavigationStack {
+            Text("\(progress)  of 6 onboaringg task completed!")
             ProgressView(
                 value: Double(progress),
                 total: 6
             )
+            .scaleEffect(x: 1, y: 3, anchor: .center)
+                        .padding()
+            .frame(width: 200)
+            .foregroundStyle(Color.accentColor.opacity(0.5))
             .padding(5)
+            if progress == 6{
+                Text("Please return to home tab to see your dashbaord")
+                    .foregroundStyle(.mint)
+                    .font(.caption).bold()
+            }
             VStack(spacing: 20) {
 
                 VStack {
@@ -81,7 +86,7 @@ struct OnBoardingView: View {
                     Spacer()
 
                     NavigationLink {
-                        AddressSearchView(editingAddressID: nil, type: .home)
+                        AddressSearchView(editingAddressID: homeAddress?.id, type: .home)
                     } label: {
 
                         Image(
@@ -90,9 +95,6 @@ struct OnBoardingView: View {
                                 ? "plus"
                                 : "pencil"
                         )
-                        .onAppear{
-                            loadAddresses()
-                        }
                         .foregroundStyle(.white)
                         .frame(width: 40, height: 40)
                         .background(
@@ -149,7 +151,7 @@ struct OnBoardingView: View {
                         NavigationLink {
                             AddressSearchView(editingAddressID: index < storeAddresses.count ? storeAddresses[index].id : nil, type: .store)
                                 .onDisappear {
-                                    loadAddresses()
+           
                                 }
                         } label: {
                             
@@ -176,15 +178,11 @@ struct OnBoardingView: View {
                         .disabled(homeAddress == nil)
                     }
                 }
-                Button("Reset Onboarding"){
-                    UserDefaults.standard.removeObject(forKey: "savedAddresses")
-                    UserDefaults.standard.set(false, forKey: "hasCompletedOnboarindg")
-                    
-                }
-                Button("Finish Setup All Addresses"){
-                    hasCompletedOnboarding = true
-                    
-                }.disabled(homeAddress == nil)
+//                Button("Reset Onboarding"){
+//                    hasCompletedOnboarding = false
+//                    
+//                }
+
 
                 Divider()
             }
@@ -192,41 +190,28 @@ struct OnBoardingView: View {
         }
         .onAppear {
             
-            loadAddresses()
-            NotificationManager.shared.requestPermission()   
+
+            checkOnboardingFinished()
+            NotificationManager.shared.requestPermission()
+            GeofenceManager.shared.startMonitoring(stores: storeAddresses)
         }
-        .onChange(of: progress){oldValue, newValue in
-            if newValue == 6{
+        .onChange(of: storeAddresses){oldValue, newValue in
+            GeofenceManager.shared.startMonitoring(stores: storeAddresses)
+        }
+        .onChange(of: progress) { oldValue, newValue in
+
+            if newValue >= 6 {
                 hasCompletedOnboarding = true
-                goToDashboard = true
             }
-        }
-        .navigationDestination(isPresented: $goToDashboard) {
-            DashboardContentView()
-                .navigationBarBackButtonHidden(true)
         }
     }
 
-    private func loadAddresses(){
-        guard let data = UserDefaults.standard.data(
-            forKey: "savedAddresses"
-        ) else {
-            addresses = []   
-            return
-        }
-        do{
-            addresses = try JSONDecoder().decode(
-                [Address].self,
-                from: data
-            )
-        } catch {
-            print("Fail to load address: \(error)")
-        }
-    }
+ 
     
     private func checkOnboardingFinished(){
         if homeAddress != nil && storeAddresses.count>=5{
             hasCompletedOnboarding = true
+            
         }
     }
     

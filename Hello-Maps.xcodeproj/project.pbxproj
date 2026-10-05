@@ -23,6 +23,8 @@
 		47529D7B3053AE1C00F508E4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				GeofenceLogEntry.swift,
+				GeofenceLogStore.swift,
 				GeofenceManager.swift,
 				LocationHelper.swift,
 				LocationManager.swift,
@@ -50,6 +52,7 @@
 				GroceryListView.swift,
 				GroceryRowView.swift,
 				OnBoardingView.swift,
+				RootView.swift,
 				SettingsView.swift,
 			);
 			target = 8DC9A9CA2A7823AD00B7BD89 /* Hello-Maps */;

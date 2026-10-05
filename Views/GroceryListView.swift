@@ -20,14 +20,35 @@ struct GroceryListView: View{
     @State var name: String = ""
     @State var category: FoodCategory = .produce
     
-               
-
+    
+    
     var body: some View{
-        VStack{
-            
+        VStack(alignment: .leading){
+            HStack{
+                Image(systemName: "apple.meditate.circle.fill")
+                    .resizable()
+                    .renderingMode(.original)
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                Text("GROCERIES")
+                    .font(.title)
+                
+            }.foregroundStyle(LinearGradient(
+                colors: [
+                    .blue,
+                    .purple
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ))
+            .padding()
             HStack{
                 TextField("Enter grocery item...", text: $name)
+                    .border(Color.butterfly, width: 2)
                     .textFieldStyle(.roundedBorder)
+                    .onSubmit {
+                       addGrocery()
+                    }
                 Picker("category", selection: $category){
                     ForEach(FoodCategory.allCases, id: \.self){category in
                         Text(category.rawValue).tag(category)
@@ -40,30 +61,60 @@ struct GroceryListView: View{
             }.padding()
             
             List{
-            ForEach(items){item in
-                //add a bindable row view
-
-                GroceryRowView(item: item)
+                ForEach(FoodCategory.allCases, id:\.self){ foodCategory in
+               //filter first
+                    let categoryItems = items.filter{
+                        $0.foodcat == foodCategory
+                    }
+                    
+                    if !categoryItems.isEmpty{
+                        
+                        Section{
+                            
+                            ForEach(categoryItems){item in
+                                //add a bindable row view
+                                
+                                GroceryRowView(item: item)
+                                
+                            }.onDelete(perform: deleteGrocery)
+                            
+                            
+                        } header:{
+                            HStack{
+                                Image(systemName: foodCategory.icon)
+                                //                                    .resizable()
+                                //                                    .foregroundStyle(.leaf)
+                                Text(foodCategory.rawValue.uppercased())
+                                    .font(.headline)
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
+            }
+        }
+    }
+            private func addGrocery(){
+                let newItem = GroceryItem(
+                    foodName: name, foodcat: category, isCompleted: false
+                )
+                modelContext.insert(newItem)
                 
-                }.onDelete(perform: deleteGrocery)
+                name = "" // clear input
             }
             
             
-        }
-    }
-    private func addGrocery(){
-        let newItem = GroceryItem(
-            foodName: name, foodcat: category, isCompleted: false
-        )
-        modelContext.insert(newItem)
+            private func deleteGrocery(at offsets: IndexSet){
+                for index in offsets{
+                    let item = items[index]
+                    modelContext.delete(item)
+                }
+            }
         
-        name = "" // clear input
-    }
+        
+        
     
-    private func deleteGrocery(at offsets: IndexSet){
-        for index in offsets{
-            let item = items[index]
-            modelContext.delete(item)
-        }
-    }
 }

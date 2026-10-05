@@ -21,7 +21,12 @@ final class LocationManager: NSObject, ObservableObject {
     func requestPermission() {
         locationManager.requestWhenInUseAuthorization()
     }
+    func requestAlwaysPermission(){
+        locationManager.requestAlwaysAuthorization()
+    }
 }
+
+
 
 extension LocationManager: CLLocationManagerDelegate {
 
@@ -31,3 +36,4 @@ extension LocationManager: CLLocationManagerDelegate {
         print("Authorization: \(manager.authorizationStatus)")
     }
 }
+

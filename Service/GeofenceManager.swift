@@ -10,7 +10,6 @@ import Foundation
 
 
 
-
 final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     static let shared = GeofenceManager()
     private let locationManager = CLLocationManager()
@@ -18,7 +17,7 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     private var dwellTask: Task<Void, Never>? //<specific type>
 //    private var dwellPhase: DwellPhase = .initialCheck
     private var monitoredStores: [Address] = []
-    
+    private var isDwellTimerRunning = false
     // one shared GeofenceManager
     
     
@@ -31,6 +30,8 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     
     @Published var lastEvent = "Waiting..."     // latest debug event
     @Published var notificationFired: Bool = false
+    @Published var monitoredRegionCount: Int = 0
+
     
     // did we reach notification step?
     
@@ -46,7 +47,8 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
             let center = CLLocationCoordinate2D(latitude: store.latitude, longitude: store.longitude) //need store lat+long to map out the center
             let region = CLCircularRegion(center: center, radius: 200, identifier: store.id.uuidString) //set how big of the circle radius as a fence
             locationManager.startMonitoring(for: region)//register for geofence
-            print ("currently monitoring \(store.name)")
+            monitoredRegionCount = locationManager.monitoredRegions.count
+            print ("currently monitoring \(monitoredRegionCount)stores)")
         }
     }
     
@@ -95,9 +97,10 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         let speedMph = speedMps * 2.23694
         
         currentSpeedMph = speedMph
-        
+        guard didEnterStore else{return}
         guard !hasNotifiedCurrentVisit else{ return} //if already notified do nothing
-        if speedMph <= 10{
+        
+        if speedMph <= 5{
             lastEvent = "Arrival detected"
             startDwellTimer()
         }else {
@@ -107,21 +110,15 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     
 }
     private func startDwellTimer() {
-        dwellTask?.cancel()
-        dwellTask = Task {
+        guard !isDwellTimerRunning else { return }
+         isDwellTimerRunning = true
+        
+        dwellTask = Task { [weak self] in
             do {
+                print("dwell timer start")
                 try await Task.sleep(for: .seconds(10))
                 guard !Task.isCancelled else { return }
-                guard !hasNotifiedCurrentVisit else{ return} //if already notified do nothing
-
-              
-                notificationFired = true
-                hasNotifiedCurrentVisit = true
-                lastEvent = "Notification fired"
-                await MainActor.run {
-                            NotificationManager.shared
-                                .scheduleNotification()         //schedule notification
-                        }
+                await self?.completeDwellTimer()
 
                     } catch {
 
@@ -150,13 +147,14 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         dwellTask = nil                                        // clear old timer
 
         print("Entered region: \(region.identifier)")
-
+        print("monitorin started: home \(region.identifier)")
         manager.requestLocation()                              // get current speed/location
     }
     
     
     
     //add a reset notification status when user exit the store
+    /*
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion){
         hasNotifiedCurrentVisit = false
         notificationFired = false
@@ -165,5 +163,90 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         dwellTask = nil
         lastEvent = "Existed store gefence"                                                              
         print("exit region\(region.identifier)")
+    }
+    */
+    
+    func locationManager(
+        _ manager: CLLocationManager,                  // Core Location manager
+        didExitRegion region: CLRegion                 // region we just left
+    ) {
+
+        didEnterStore = false                          // Field Test → FALSE
+
+        hasNotifiedCurrentVisit = false                // next entry can notify again
+
+        notificationFired = false                      // reset notification debug value
+
+        dwellTask?.cancel()                            // cancel pending timer
+
+        dwellTask = nil                                // remove timer
+
+        lastEvent = "EXITED: \(region.identifier)"     // example: EXITED: home test
+
+        print("EXITED: \(region.identifier)")          // Xcode debug output
+    }
+    
+    
+    func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion){
+        monitoredRegionCount = manager.monitoredRegions.count
+        
+        lastEvent = "started monitoring region"
+        
+        print("Monitoring started: \(region.identifier)")
+        
+    }
+    
+    
+    func startHomeTest(address: Address){
+        let center = CLLocationCoordinate2D(
+            latitude: address.latitude,
+            longitude: address.longitude
+        )
+        
+        let region = CLCircularRegion(
+            center: center,
+            radius: 200,
+            identifier: "home test"
+            
+        )
+        
+        region.notifyOnEntry = true
+        region.notifyOnExit = true
+        
+        locationManager.startMonitoring(for: region)
+        locationManager.requestState(for: region)
+        
+        lastEvent = "home test region started"
+        
+    }
+    
+    func startLiveTracking(){
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.startUpdatingLocation()
+        lastEvent = "live tracking started" //debug
+    }
+    
+    func stopLiveTracking(){
+        locationManager.stopUpdatingLocation()
+        lastEvent = "live tracking stopped" //debug
+    }
+    
+    private func cancelDwellTimer(){
+        guard isDwellTimerRunning else {return}
+        dwellTask?.cancel()
+        dwellTask = nil
+        isDwellTimerRunning = false
+        print("dwell timeer canceled")
+    }
+    
+    
+    @MainActor
+    private func completeDwellTimer(){
+        guard !hasNotifiedCurrentVisit else {return}
+        notificationFired = true
+        hasNotifiedCurrentVisit = true
+        lastEvent = "notification fired"
+        NotificationManager.shared.scheduleNotification()
+        print("dwell timer completed")
     }
 }
