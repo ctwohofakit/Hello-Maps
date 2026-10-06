@@ -27,6 +27,7 @@ import UIKit
 final class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate{
     static let shared = NotificationManager()
     @Published var showBagConfirmation = false
+    @Published var currentTripID: UUID?
     
     override private init(){
         super.init()
@@ -57,12 +58,15 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
         completionHandler([.banner, .sound, .badge])
     }
     
-    func scheduleNotification(){
+    func scheduleNotification(tripID: UUID? = nil){
         let content = UNMutableNotificationContent()
         content.title = "Bag Reminder!!!"
         content.body = "Don't forget to bring your reusable bag before heading inside."
         content.sound = .default
-        showBagConfirmation = true 
+
+        if let tripID{
+            content.userInfo = ["tripID": tripID.uuidString]
+        }
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         let request = UNNotificationRequest(identifier: "reusableBagReminder", content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(request) { error in
@@ -77,8 +81,18 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
     //user tap on notification
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         print("user tapped notification")
-            showBagConfirmation = true
-            print("showBagConfirmation state =\(showBagConfirmation)")
+           
+        let userInfo = response.notification.request.content.userInfo
+        guard let idString = userInfo["tripID"] as? String,
+              let tripID = UUID(uuidString: idString)else {
+            print("no valid tripID found in notificaiton")
+            return
+        }
+        currentTripID = tripID
+        print("notification belong to trip: \(tripID)")
+        showBagConfirmation = true
+        print("showBagConfirmation state =\(showBagConfirmation)")
+                
         }
     
 }

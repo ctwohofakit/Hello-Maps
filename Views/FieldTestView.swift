@@ -11,22 +11,22 @@ struct FieldTestView: View {
 
     @State private var notificationPermission = "Checking"
     @ObservedObject var geofenceManager = GeofenceManager.shared
-    private func checkNotificaitonPermission() async{
-        let settings = await UNUserNotificationCenter.current().notificationSettings()
-        switch settings.authorizationStatus{
-        case .authorized:
-            notificationPermission = "Allowed"
-        case .denied:
-            notificationPermission = "Denied"
-        case .notDetermined:
-            notificationPermission = "not determined"
-        case .provisional:
-            notificationPermission = "provisional"
-        case .ephemeral:
-            notificationPermission = "ephmeral"
-            
-        }
-    }
+//    private func checkNotificaitonPermission() async{
+//        let settings = await UNUserNotificationCenter.current().notificationSettings()
+//        switch settings.authorizationStatus{
+//        case .authorized:
+//            notificationPermission = "Allowed"
+//        case .denied:
+//            notificationPermission = "Denied"
+//        case .notDetermined:
+//            notificationPermission = "not determined"
+//        case .provisional:
+//            notificationPermission = "provisional"
+//        case .ephemeral:
+//            notificationPermission = "ephmeral"
+//            
+//        }
+//    }
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \GeofenceLogEntry.date, order: .reverse)
     private var logs: [GeofenceLogEntry]
@@ -104,8 +104,8 @@ struct FieldTestView: View {
         .navigationTitle("Field Test")
         .task {
 
-            await checkNotificaitonPermission()
-            geofenceManager.startLiveTracking()
+//            await checkNotificaitonPermission()
+//            geofenceManager.startLiveTracking()
         }
         .onDisappear{
             geofenceManager.stopLiveTracking()

@@ -29,11 +29,7 @@ struct RootView: View{
                     Label("Address", systemImage: "mappin.and.ellipse")
                 }
                 .tag(2)
-            FieldTestView()
-                .tabItem {
-                    Label("FieldTestView", systemImage: "gear")
-                }
-                .tag(3)
+            
     }.onAppear{
         GeofenceManager.shared.startMonitoring(stores: storeAddresses)
     }

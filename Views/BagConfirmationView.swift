@@ -10,8 +10,8 @@ import SwiftUI
 struct BagConfirmationView: View {
     
     @State private var shoppingTrip: [ShoppingTrip] = []
-    
     let id: UUID
+   
     var body: some View {
         
         VStack{
@@ -24,6 +24,7 @@ struct BagConfirmationView: View {
                 HStack{
                     Button{
                         updateTrip(id: id, result: .confirmed)
+                        NotificationManager.shared.currentTripID = nil
                         NotificationManager.shared.showBagConfirmation = false
                         
                     }label:{Text("🎉 I remember")}
@@ -35,6 +36,7 @@ struct BagConfirmationView: View {
                     Spacer()
                     Button{
                         updateTrip(id: id, result:.forgotten)
+                        NotificationManager.shared.currentTripID = nil
                         NotificationManager.shared.showBagConfirmation = false
                         
                     }label:{Text("😭 I forgot")}

@@ -111,7 +111,7 @@ struct DashboardContentView: View {
                             .font(.caption2).bold()
                             .foregroundStyle(.mint.opacity(0.7))
                         VStack (alignment: .leading){
-                            Text("\(tripsThisWeek)") //how many bag saved
+                            Text("\(bagsSavedThisWeek)") //how many bag saved
                             Text("Bags Saved")
                                 .font(.title3)
                             Text("this week")
@@ -202,7 +202,7 @@ struct DashboardContentView: View {
                         
                         HStack{
                             Image(systemName: "bag.fill")
-                                .foregroundStyle(.purple.opacity(0.5))
+                                .foregroundStyle(.purple.opacity(0.8))
                             Text("Bag Success Rate:")
                         }
                         .font(.title2)
@@ -220,7 +220,7 @@ struct DashboardContentView: View {
                                         to: successfulRate
                                     )
                                     .stroke(
-                                        Color.butterfly,
+                                        Color.purple,
                                         style: StrokeStyle(
                                             lineWidth: 10,
                                             lineCap: .round
@@ -293,7 +293,7 @@ struct DashboardContentView: View {
     }
     
     private var bagsSavedByDay: [DailyBagCount] {
-        let weekdays = ["Mon", "Tues", "Wed", "Thur","Fri", "Sat","Sun"]
+        let weekdays = ["Mon", "Tue", "Wed", "Thur","Fri", "Sat","Sun"]
         var result: [DailyBagCount] = []
         
         for day in weekdays {
@@ -314,7 +314,7 @@ struct DashboardContentView: View {
     
     private var currentTripStreak: Int{
         let answeredTrips = shoppingTrips.filter{trip in
-            trip.bagResult != nil
+            trip.bagResult != .unknown
         }.sorted{ firstTrip, secondTrip in
             firstTrip.date > secondTrip.date
             
