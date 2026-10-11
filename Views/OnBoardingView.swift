@@ -12,7 +12,9 @@ struct OnBoardingView: View {
    //MARK: non-mock
     @Query private var addresses:[Address]
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-
+    @StateObject private var locationManager = LocationManager()
+    private var storeArrivalRemindersEnabled = false
+    
     private var homeAddress: Address? {
         addresses.first {
             $0.type == .home
@@ -31,11 +33,16 @@ struct OnBoardingView: View {
 
         return homeCount + storeCount
     }
+    
+
 
     var body: some View {
       
 
         NavigationStack {
+            Text("before setting up the app/address, please bring your reusable bag to your car.")
+                .foregroundStyle(.pink)
+                .padding()
             Text("\(progress)  of 6 onboaringg task completed!")
             ProgressView(
                 value: Double(progress),
@@ -46,22 +53,26 @@ struct OnBoardingView: View {
             .frame(width: 200)
             .foregroundStyle(Color.accentColor.opacity(0.5))
             .padding(5)
+            if progress < 6{
+                Text("Please enter home address and 5 frequent store at stores!")
+            }
             if progress == 6{
                 Text("Please return to home tab to see your dashbaord")
                     .foregroundStyle(.mint)
                     .font(.caption).bold()
             }
             VStack(spacing: 20) {
+                
+                //                VStack {
+                //                    Button("Allow Notifications") {
+                //                        NotificationManager.shared.requestPermission()
+                //                    }
+                //
+                //                    Button("Test Notification") {
+                //                        NotificationManager.shared.scheduleNotification()
+                //                    }
+                //                }
 
-                VStack {
-                    Button("Allow Notifications") {
-                        NotificationManager.shared.requestPermission()
-                    }
-
-                    Button("Test Notification") {
-                        NotificationManager.shared.scheduleNotification()
-                    }
-                }
 
                 // HOME
                 HStack {
@@ -192,6 +203,7 @@ struct OnBoardingView: View {
             
 
             checkOnboardingFinished()
+            locationManager.requestPermission()
             NotificationManager.shared.requestPermission()
             GeofenceManager.shared.startMonitoring(stores: storeAddresses)
         }

@@ -21,36 +21,44 @@ struct BagConfirmationView: View {
                 Text("Did you remember to bring your resuable bag?")
                     .foregroundStyle(.blue)
                     .font(.title)
-                HStack{
+     
                     Button{
                         updateTrip(id: id, result: .confirmed)
                         NotificationManager.shared.currentTripID = nil
                         NotificationManager.shared.showBagConfirmation = false
                         
-                    }label:{Text("🎉 I remember")}
+                    }label:{
+                        HStack{
+                            Image(systemName: "face.smiling.inverse")
+                            Text("I remember")}
+                    }
                         .buttonStyle(.bordered)
-                              .controlSize(.large)
-                              .buttonBorderShape(.automatic)
-     
-
-                    Spacer()
+                        .controlSize(.large)
+                        .buttonBorderShape(.automatic)
+                    
+                HStack{
                     Button{
                         updateTrip(id: id, result:.forgotten)
                         NotificationManager.shared.currentTripID = nil
                         NotificationManager.shared.showBagConfirmation = false
                         
-                    }label:{Text("😭 I forgot")}
+                    }label:{
+                        HStack{
+                            Image(systemName: "xmark.circle.fill")
+                            Text("I forgot")
+                        }
+                    }
                         .buttonStyle(.bordered)
-                              .controlSize(.large)
-                              .buttonBorderShape(.automatic)
-                     
+                        .controlSize(.large)
+                        .buttonBorderShape(.automatic)
+                }
 
-                }.padding()
-                    .frame(width:335, height:500)
-                    .background(.butterfly)
-                    .cornerRadius(12)
+               
                 
-            }
+            } .padding()
+                .frame(width:335, height:500)
+                .background(.butterfly)
+                .cornerRadius(12)
             
         }
         

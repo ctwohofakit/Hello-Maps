@@ -7,7 +7,7 @@
 import Charts
 import SwiftUI
 
-struct DashboardContentView: View {
+struct DashboardView: View {
     @State private var shoppingTrips: [ShoppingTrip] = []
     @State private var breathe = false
     
@@ -23,6 +23,10 @@ struct DashboardContentView: View {
      
      */
     //alltime shoppingTrip, confirmation count
+    
+    //menu
+ 
+    
     private var confirmedCount: Int {
         shoppingTrips.filter{ trip in
             trip.bagResult == .confirmed
@@ -64,10 +68,10 @@ struct DashboardContentView: View {
                     }
                     
                     Spacer()
-                    NavigationLink(destination: FieldTestView()) {
-                        Image(systemName: "gear")
-                            .imageScale(.large)
-                    }
+//                    NavigationLink(destination: FieldTestView()) {
+//                        Image(systemName: "gear")
+//                            .imageScale(.large)
+//                    }
                 }
                 
                 HStack{
@@ -210,7 +214,7 @@ struct DashboardContentView: View {
                             ZStack{
                                 Circle()
                                     .stroke(
-                                        Color.gray.opacity(0.2),
+                                        Color.mint.opacity(0.8),
                                         lineWidth: 10
                                     )
                                 
@@ -230,7 +234,7 @@ struct DashboardContentView: View {
                                 Text("\(Int(successfulRate*100))%")
                                     .font(.title2)
                                     .fontWeight(.bold)
-                                    .foregroundStyle(.butterfly)
+                                    .foregroundStyle(.pink.opacity(0.6))
                                 
                             }
                             Spacer(minLength: 1)

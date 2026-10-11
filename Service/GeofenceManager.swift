@@ -41,10 +41,43 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     }
     
     //Monitoring and setup CLRegion, check address array, pass store address 1 at a time to st as CLRegion
+    private struct MonitoredStoreInfo: Codable{
+        let id: UUID
+        let name: String
+    }
+    
+    private var savedStoreInfo: [MonitoredStoreInfo]{
+        get{
+            guard let data = UserDefaults.standard.data(
+                forKey: "monitoredStoreInfo"
+            )else {
+                return []
+            }
+            return (try? JSONDecoder().decode(
+                [MonitoredStoreInfo].self,
+                from: data
+            )) ?? []
+        }set{
+            guard let data = try? JSONEncoder().encode(newValue) else{
+                return
+            }
+            UserDefaults.standard.set(
+                data,
+                forKey: "monitoredStoreInfo"
+            )
+        }
+        
+    }
     
     func startMonitoring(stores: [Address]){// monitor all store
         monitoredStores = stores
         print("saved monitored store count is \(monitoredStores.count)")
+        savedStoreInfo = stores.map{
+            MonitoredStoreInfo(
+                id: $0.id,
+                name: $0.name
+            )
+        }
         for store in stores{
             let center = CLLocationCoordinate2D(latitude: store.latitude, longitude: store.longitude) //need store lat+long to map out the center
             let region = CLCircularRegion(center: center, radius: 200, identifier: store.id.uuidString) //set how big of the circle radius as a fence
@@ -56,6 +89,8 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
             LAT: \(store.latitude)
             LON: \(store.longitude)
             """)
+            region.notifyOnEntry = true
+            region.notifyOnExit = true
             locationManager.startMonitoring(for: region)//register for geofence
             locationManager.requestState(for: region)
             monitoredRegionCount = locationManager.monitoredRegions.count
@@ -63,6 +98,8 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
             
         }
     }
+    
+
     
     func locationManager(
         _ manager: CLLocationManager,
@@ -105,10 +142,10 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
     //check geofence entry
     
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        guard let circularRegion = region as? CLCircularRegion else {
+        guard region is CLCircularRegion else {
             return                                             // only handle circular store regions
         }
-        guard let store = monitoredStores.first(where: { $0.id.uuidString == region.identifier })
+        guard let store = savedStoreInfo.first(where: { $0.id.uuidString == region.identifier })
         else{
             print("store no foun")
             return
@@ -141,9 +178,31 @@ final class GeofenceManager: NSObject, ObservableObject, CLLocationManagerDelega
         
     }
     
+    private var lastDebugRegionState: [String: Bool] = [:]
     
-    
-    
+    private func checkCurrentREgionState(location: CLLocation){
+        for monitoredRgion in self.locationManager.monitoredRegions{
+            guard let region = monitoredRgion as? CLCircularRegion else {continue}
+            
+            let regionCenter = CLLocation(
+                latitude: region.center.latitude,
+                longitude: region.center.longitude
+            )
+            
+            
+            let isInside = region.contains(location.coordinate)
+            let  previousState = lastDebugRegionState[region.identifier]
+            if previousState != isInside{
+                lastDebugRegionState[region.identifier] = isInside
+                if isInside{
+                    print("enter region:\(region.identifier)")
+                }else{
+                    print("out region\(region.identifier)")
+                }
+            }
+        }
+        
+    }
     
     //get the lastest loation upadte from CLLocation, used to check speed
     //CLLocaiton hs speed info, coordinate, timestamp

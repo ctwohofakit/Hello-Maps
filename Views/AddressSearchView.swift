@@ -72,7 +72,8 @@ struct AddressSearchView: View {
             }
             .padding()
             .task {
-                locationManager.requestPermission()
+             
+                locationManager.requestAlwaysPermission()
             }
             
             if type == .store && !results.isEmpty {

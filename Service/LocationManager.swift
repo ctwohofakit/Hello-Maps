@@ -12,6 +12,7 @@ import Combine
 final class LocationManager: NSObject, ObservableObject {
 
     private let locationManager = CLLocationManager()
+    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     
     override init() {
         super.init()
