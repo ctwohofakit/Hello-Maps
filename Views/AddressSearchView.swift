@@ -37,7 +37,7 @@ struct AddressSearchView: View {
                 type == .home
                 ? "Set Up Your Home Address"
                 : "Add a Frequent Store"
-            )
+            ).accessibilityLabel("addressSearchViewText")
             HStack {
                 TextField(type == .home ? "Enter your home addrss" : " input store name and city name", text: $searchText)
                     .textFieldStyle(.roundedBorder)
@@ -120,6 +120,7 @@ struct AddressSearchView: View {
             } label: {
                 Text("Cancel")
             }
+            .accessibilityLabel("cancelButton")
             .buttonStyle(.borderedProminent)
         }
         }

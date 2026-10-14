@@ -41,6 +41,7 @@ struct OnBoardingView: View {
 
         NavigationStack {
             Text("before setting up the app/address, please bring your reusable bag to your car.")
+                .accessibilityIdentifier("bagReminderText")
                 .foregroundStyle(.pink)
                 .padding()
             Text("\(progress)  of 6 onboaringg task completed!")
@@ -55,6 +56,7 @@ struct OnBoardingView: View {
             .padding(5)
             if progress < 6{
                 Text("Please enter home address and 5 frequent store at stores!")
+                    .accessibilityIdentifier("beforeInputStoreText")
             }
             if progress == 6{
                 Text("Please return to home tab to see your dashbaord")
@@ -92,6 +94,7 @@ struct OnBoardingView: View {
                     } else {
 
                         Text("Please Add Home Address")
+                            .accessibilityIdentifier("home_address_txt")
                     }
 
                     Spacer()
@@ -106,6 +109,7 @@ struct OnBoardingView: View {
                                 ? "plus"
                                 : "pencil"
                         )
+                        .accessibilityIdentifier("add_home_button")
                         .foregroundStyle(.white)
                         .frame(width: 40, height: 40)
                         .background(
